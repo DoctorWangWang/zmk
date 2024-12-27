@@ -14,31 +14,19 @@ The Mod-Morph behavior sends a different keypress, depending on whether a specif
 
 The Mod-Morph behavior acts as one of two keycodes, depending on if the required modifier is being held during the keypress.
 
-When the modifier is being held it is sent along with the morphed keycode. This can cause problems when the morphed keycode and modifier have an existing relationship (such as `shift-delete` or `ctrl-v` on many operating systems).
-
-As a remedy, you can add the optional attribute `masked_mods`, containing
-the bitwise OR of the modifiers that should be disabled while the key is held,
-so that they are not included in the report sent to the host.
-
 ### Configuration
 
 An example of how to implement the mod-morph "Grave Escape":
 
-```
+```dts
 / {
     behaviors {
         gresc: grave_escape {
             compatible = "zmk,behavior-mod-morph";
-            label = "GRAVE_ESCAPE";
             #binding-cells = <0>;
             bindings = <&kp ESC>, <&kp GRAVE>;
             mods = <(MOD_LGUI|MOD_LSFT|MOD_RGUI|MOD_RSFT)>;
-            masked_mods = <(MOD_LGUI|MOD_LSFT)>; // don't send left modifiers
         };
-    };
-
-    keymap {
-        ...
     };
 };
 ```
@@ -52,7 +40,7 @@ Note that this specific mod-morph exists in ZMK by default using code `&gresc`.
 
 Example:
 
-```
+```dts
 &gresc
 ```
 
@@ -73,6 +61,34 @@ Available Modifiers:
 
 Example:
 
-```
+```dts
 mods = <(MOD_LGUI|MOD_LSFT|MOD_RGUI|MOD_RSFT)>;
 ```
+
+### Advanced Configuration
+
+`keep-mods`
+
+When a modifier specified in `mods` is being held, it won't be sent along with the morphed keycode unless it is also specified in `keep-mods`. By default `keep-mods` equals `0`, which means no modifier specified in `mods` will be sent along with the morphed keycode.
+
+For example, the following configuration morphs `LEFT_SHIFT` + `BACKSPACE` into `DELETE`, and morphs `RIGHT_SHIFT` + `BACKSPACE` into `RIGHT_SHIFT` + `DELETE`.
+
+```dts
+/ {
+    behaviors {
+        bspc_del: backspace_delete {
+            compatible = "zmk,behavior-mod-morph";
+            #binding-cells = <0>;
+            bindings = <&kp BACKSPACE>, <&kp DELETE>;
+            mods = <(MOD_LSFT|MOD_RSFT)>;
+            keep-mods = <(MOD_RSFT)>;
+        };
+    };
+};
+```
+
+:::note[Karabiner-Elements (macOS) interfering with mod-morphs]
+
+If the first modified key press sends the modifier along with the morphed keycode and [Karabiner-Elements](https://karabiner-elements.pqrs.org/) is running, disable the "Modify Events" toggle from Karabiner's "Devices" settings page for the keyboard running ZMK.
+
+:::

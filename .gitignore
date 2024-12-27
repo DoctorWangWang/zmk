@@ -5,6 +5,14 @@
 /zephyr
 /zmk-config
 /build
+
+# macOS
 *.DS_Store
+
+# Python
 __pycache__
-*.~undo-tree~
+.python-version
+.venv
+
+# clangd
+app/.cache/

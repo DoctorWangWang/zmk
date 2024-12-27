@@ -1,55 +1,50 @@
 /*
- * Copyright (c) 2020 The ZMK Contributors
+ * Copyright (c) 2023 The ZMK Contributors
  *
  * SPDX-License-Identifier: MIT
  */
 #pragma once
 
+#include <zephyr/dt-bindings/dt-util.h>
+
 /* Mouse press behavior */
 /* Left click */
-#define MB1 (0x01)
+#define MB1 BIT(0)
 #define LCLK (MB1)
 
 /* Right click */
-#define MB2 (0x02)
+#define MB2 BIT(1)
 #define RCLK (MB2)
 
 /* Middle click */
-#define MB3 (0x04)
+#define MB3 BIT(2)
 #define MCLK (MB3)
 
-#define MB4 (0x08)
+#define MB4 BIT(3)
+#define MB5 BIT(4)
 
-#define MB5 (0x10)
+#ifndef ZMK_MOUSE_DEFAULT_MOVE_VAL
+#define ZMK_MOUSE_DEFAULT_MOVE_VAL 600
+#endif
 
-#define MB6 (0x20)
-
-#define MB7 (0x40)
-
-#define MB8 (0x80)
+#ifndef ZMK_MOUSE_DEFAULT_SCRL_VAL
+#define ZMK_MOUSE_DEFAULT_SCRL_VAL 10
+#endif
 
 /* Mouse move behavior */
-#define MOVE_VERT(vert) ((vert)&0xFFFF)
-#define MOVE_VERT_DECODE(encoded) (int16_t)((encoded)&0x0000FFFF)
-#define MOVE_HOR(hor) (((hor)&0xFFFF) << 16)
-#define MOVE_HOR_DECODE(encoded) (int16_t)(((encoded)&0xFFFF0000) >> 16)
+#define MOVE_Y(vert) ((vert)&0xFFFF)
+#define MOVE_Y_DECODE(encoded) (int16_t)((encoded)&0x0000FFFF)
+#define MOVE_X(hor) (((hor)&0xFFFF) << 16)
+#define MOVE_X_DECODE(encoded) (int16_t)(((encoded)&0xFFFF0000) >> 16)
 
-#define MOVE(hor, vert) (MOVE_HOR(hor) + MOVE_VERT(vert))
+#define MOVE(hor, vert) (MOVE_X(hor) + MOVE_Y(vert))
 
-#define MOVE_UP MOVE_VERT(-600)
-#define MOVE_DOWN MOVE_VERT(600)
-#define MOVE_LEFT MOVE_HOR(-600)
-#define MOVE_RIGHT MOVE_HOR(600)
+#define MOVE_UP MOVE_Y(-ZMK_MOUSE_DEFAULT_MOVE_VAL)
+#define MOVE_DOWN MOVE_Y(ZMK_MOUSE_DEFAULT_MOVE_VAL)
+#define MOVE_LEFT MOVE_X(-ZMK_MOUSE_DEFAULT_MOVE_VAL)
+#define MOVE_RIGHT MOVE_X(ZMK_MOUSE_DEFAULT_MOVE_VAL)
 
-/* Mouse scroll behavior */
-#define SCROLL_VERT(vert) ((vert)&0xFFFF)
-#define SCROLL_VERT_DECODE(encoded) (int16_t)((encoded)&0x0000FFFF)
-#define SCROLL_HOR(hor) (((hor)&0xFFFF) << 16)
-#define SCROLL_HOR_DECODE(encoded) (int16_t)(((encoded)&0xFFFF0000) >> 16)
-
-#define SCROLL(hor, vert) (SCROLL_HOR(hor) + SCROLL_VERT(vert))
-
-#define SCROLL_UP SCROLL_VERT(10)
-#define SCROLL_DOWN SCROLL_VERT(-10)
-#define SCROLL_LEFT SCROLL_HOR(-10)
-#define SCROLL_RIGHT SCROLL_HOR(10)
+#define SCRL_UP MOVE_Y(ZMK_MOUSE_DEFAULT_SCRL_VAL)
+#define SCRL_DOWN MOVE_Y(-ZMK_MOUSE_DEFAULT_SCRL_VAL)
+#define SCRL_LEFT MOVE_X(-ZMK_MOUSE_DEFAULT_SCRL_VAL)
+#define SCRL_RIGHT MOVE_X(ZMK_MOUSE_DEFAULT_SCRL_VAL)
